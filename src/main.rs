@@ -1,14 +1,12 @@
+use rudis::commands::{set_command::SetCommand, traits::Command};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     net::TcpStream,
 };
 
-const READ_SIZE: usize = 1024;
-
 #[derive(Debug)]
 struct RedisClient {
     stream: BufReader<TcpStream>,
-    read_buffer: String,
     write_buffer: String,
 }
 
@@ -16,7 +14,6 @@ impl RedisClient {
     fn from_stream(stream: TcpStream) -> Self {
         RedisClient {
             stream: BufReader::new(stream),
-            read_buffer: String::default(),
             write_buffer: String::default(),
         }
     }
@@ -32,9 +29,15 @@ impl RedisClient {
 
 #[tokio::main]
 async fn main() {
+    let cmd = SetCommand {};
+
+    println!("Com SetCommand::TYPE_LITERAL {}", SetCommand::TYPE_LITERAL);
+    println!("com SetCommand.get_literal() {}", cmd.get_literal());
+
     let listener = tokio::net::TcpListener::bind("127.0.0.1:6379")
         .await
         .expect(&format!("Error binding on port {}", 6379));
+
     println!("Redis server listening on 127.0.0.1:6379");
 
     loop {
@@ -63,6 +66,12 @@ async fn main() {
                         }
 
                         RedisClient::parse_query(buff).await;
+                        if let Ok(var) = std::str::from_utf8(&buff[0..10]) {
+                            match var {
+                                SetCommand::TYPE_LITERAL => println!("Veio SET"),
+                                &_ => println!("Veio outra coisa"),
+                            }
+                        }
 
                         let size = buff.len();
 
