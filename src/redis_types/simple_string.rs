@@ -1,7 +1,7 @@
 use crate::redis_types::RedisType;
 use nom::{
-    IResult, Parser,
-    bytes::{tag, take_until},
+    IResult,
+    bytes::complete::{tag, take_until},
 };
 
 #[derive(Debug, PartialEq)]
@@ -15,9 +15,9 @@ impl SimpleStringDataType {
     }
 
     pub fn parse<'a>(input: &'a str) -> IResult<&'a str, RedisType> {
-        let (input, _) = tag(Self::RESP_IDENTIFIER).parse(input)?;
+        let (input, _) = tag(Self::RESP_IDENTIFIER)(input)?;
 
-        let (input, string) = take_until("\r\n").parse(input)?;
+        let (input, string) = take_until("\r\n")(input)?;
 
         Ok((
             input,

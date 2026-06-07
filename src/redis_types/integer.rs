@@ -1,6 +1,6 @@
 use nom::{
     IResult, Parser,
-    bytes::{tag, take_until},
+    bytes::{complete::take_until, tag},
     error::{Error, ErrorKind},
 };
 
@@ -19,7 +19,7 @@ impl IntegerDataType {
     pub fn parse<'a>(input: &'a str) -> IResult<&'a str, RedisType> {
         let (input, _) = tag(Self::RESP_IDENTIFIER).parse(input)?;
 
-        let (input, integer_str) = take_until("\r\n").parse(input)?;
+        let (input, integer_str) = take_until("\r\n")(input)?;
 
         match integer_str.parse::<i64>() {
             Ok(parsed_int) => Ok((input, RedisType::Integer(IntegerDataType::new(parsed_int)))),

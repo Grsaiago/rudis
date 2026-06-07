@@ -1,7 +1,9 @@
+mod bulk_string;
 mod integer;
 mod simple_error;
 mod simple_string;
 
+pub use bulk_string::BulkStringDataType;
 pub use integer::IntegerDataType;
 pub use simple_error::SimpleErrorDataType;
 pub use simple_string::SimpleStringDataType;
