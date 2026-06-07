@@ -1,7 +1,11 @@
 [package]
 name = "rudis"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-tokio = { version = "1.38.0", features = ["full"] }
+nom = "8.0.0"
+tokio = { version = "1.52.3", features = ["full"] }
+tokio-stream = { version = "0.1.18", features = ["net"] }
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
