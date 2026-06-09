@@ -1,9 +1,6 @@
 use nom::{
-    IResult, Parser,
-    bytes::{
-        complete::{take, take_while1},
-        tag,
-    },
+    IResult,
+    bytes::complete::{tag, take, take_while1},
     error::{Error, ErrorKind},
 };
 
@@ -20,17 +17,17 @@ impl BulkStringDataType {
     }
 
     pub fn parse<'a>(input: &'a str) -> IResult<&'a str, RedisType> {
-        let (input, _) = tag(Self::RESP_IDENTIFIER).parse(input)?;
+        let (input, _) = tag(Self::RESP_IDENTIFIER)(input)?;
 
         let (input, string_len_raw) = take_while1(|c: char| c.is_ascii_digit())(input)?;
         let string_len = match string_len_raw.parse::<u64>() {
             Ok(val) => val,
             Err(_) => return Err(nom::Err::Failure(Error::new(input, ErrorKind::MapRes))),
         };
-        let (input, _) = tag("\r\n").parse(input)?;
+        let (input, _) = tag("\r\n")(input)?;
 
         let (input, raw_string) = take(string_len)(input)?;
-        let (input, _) = tag("\r\n").parse(input)?;
+        let (input, _) = tag("\r\n")(input)?;
 
         return Ok((
             input,
