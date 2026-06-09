@@ -10,14 +10,14 @@ pub struct SimpleStringDataType(String);
 impl SimpleStringDataType {
     const RESP_IDENTIFIER: &str = "+";
 
-    pub fn new(value: String) -> Self {
-        Self(value)
+    pub fn new<T: ToString>(value: T) -> Self {
+        Self(value.to_string())
     }
 
     pub fn parse<'a>(input: &'a str) -> IResult<&'a str, RedisType> {
         let (input, _) = tag(Self::RESP_IDENTIFIER)(input)?;
-
         let (input, string) = take_until("\r\n")(input)?;
+        let (input, _) = tag("\r\n")(input)?;
 
         Ok((
             input,
@@ -28,19 +28,42 @@ impl SimpleStringDataType {
 
 #[cfg(test)]
 mod test {
+    use nom::IResult;
+
     use crate::redis_types::{RedisType, SimpleStringDataType};
 
     #[test]
     fn simple_parse() {
-        let input = "+asdasdasdasd\r\n";
+        struct TestCase<'a> {
+            input: &'a str,
+            expected: IResult<&'a str, RedisType>,
+        }
 
-        let result = SimpleStringDataType::parse(input);
-        assert!(result.is_ok());
-        let (_, parsed) = result.unwrap();
+        let cases = [
+            TestCase {
+                input: "aaaaa",
+                expected: Ok((
+                    "",
+                    RedisType::SimpleString(SimpleStringDataType::new("aaaaa")),
+                )),
+            },
+            TestCase {
+                input: "oieoie",
+                expected: Ok((
+                    "",
+                    RedisType::SimpleString(SimpleStringDataType::new("oieoie")),
+                )),
+            },
+        ];
 
-        let expected = RedisType::SimpleString(SimpleStringDataType::new(
-            input[1..input.len() - 2].to_string(),
-        ));
-        assert_eq!(expected, parsed)
+        for (i, case) in cases.iter().enumerate() {
+            let input = format!("+{}\r\n", case.input);
+            let result = SimpleStringDataType::parse(&input);
+            assert_eq!(
+                result, case.expected,
+                "case number {}, the input was `{}`",
+                i, &input
+            );
+        }
     }
 }

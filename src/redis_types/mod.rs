@@ -15,6 +15,7 @@ pub enum RedisType {
     SimpleString(SimpleStringDataType),
     SimpleError(SimpleErrorDataType),
     Integer(IntegerDataType),
+    BulkString(BulkStringDataType),
 }
 
 impl RedisType {
