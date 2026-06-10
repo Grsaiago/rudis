@@ -4,7 +4,7 @@ use nom::{
     bytes::complete::{tag, take_until},
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct SimpleErrorDataType(String);
 
 impl SimpleErrorDataType {

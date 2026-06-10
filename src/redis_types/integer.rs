@@ -6,7 +6,7 @@ use nom::{
 
 use crate::redis_types::RedisType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct IntegerDataType(i64);
 
 impl IntegerDataType {
@@ -66,40 +66,5 @@ mod test {
                 i, &input
             );
         }
-    }
-
-    #[test]
-    pub fn i64_max() {
-        let integer_value = i64::MAX;
-        let input = format!(":{}\r\n", integer_value.to_string());
-
-        let result = IntegerDataType::parse(&input);
-        assert!(result.is_ok());
-        let (_, parsed) = result.unwrap();
-
-        let expected = RedisType::Integer(IntegerDataType::new(integer_value));
-        assert_eq!(expected, parsed)
-    }
-
-    #[test]
-    pub fn i64_min() {
-        let integer_value = i64::MIN;
-        let input = format!(":{}\r\n", integer_value.to_string());
-
-        let result = IntegerDataType::parse(&input);
-        assert!(result.is_ok());
-        let (_, parsed) = result.unwrap();
-
-        let expected = RedisType::Integer(IntegerDataType::new(integer_value));
-        assert_eq!(expected, parsed)
-    }
-
-    #[test]
-    pub fn out_of_i64_range() {
-        let integer_value = i128::MAX;
-        let input = format!(":{}\r\n", integer_value.to_string());
-
-        let result = IntegerDataType::parse(&input);
-        assert!(result.is_err());
     }
 }

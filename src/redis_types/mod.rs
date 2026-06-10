@@ -14,7 +14,7 @@ pub use simple_string::SimpleStringDataType;
 
 use nom::{IResult, Parser, branch::alt};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum RedisType {
     Array(ArrayDataType),
     NullBulkString(NullBulkStringData),
@@ -35,5 +35,34 @@ impl RedisType {
             SimpleStringDataType::parse,
         ))
         .parse(input)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use nom::IResult;
+
+    use crate::redis_types::{NullBulkStringData, RedisType};
+
+    #[test]
+    fn simple_parse() {
+        struct TestCase<'a> {
+            input: &'a str,
+            expected: IResult<&'a str, RedisType>,
+        }
+
+        let cases = [TestCase {
+            input: "$-1\r\n",
+            expected: Ok(("", RedisType::NullBulkString(NullBulkStringData::new()))),
+        }];
+
+        for (i, case) in cases.iter().enumerate() {
+            let result = RedisType::parse(case.input);
+            assert_eq!(
+                result, case.expected,
+                "case number {}, the input was `{}`",
+                i, case.input
+            );
+        }
     }
 }

@@ -2,7 +2,7 @@ use nom::{IResult, bytes::complete::tag};
 
 use crate::redis_types::RedisType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct NullBulkStringData;
 
 impl NullBulkStringData {

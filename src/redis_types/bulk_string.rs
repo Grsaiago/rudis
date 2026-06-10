@@ -6,7 +6,7 @@ use nom::{
 
 use crate::redis_types::RedisType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct BulkStringDataType(String);
 
 impl BulkStringDataType {
@@ -43,7 +43,7 @@ mod test {
     use crate::redis_types::{BulkStringDataType, RedisType};
 
     #[test]
-    pub fn simple_parse() {
+    fn simple_parse() {
         struct TestCase<'a> {
             input: &'a str,
             expected: IResult<&'a str, RedisType>,
