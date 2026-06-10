@@ -1,6 +1,6 @@
 use nom::{
     IResult,
-    bytes::complete::{tag, take_until},
+    bytes::streaming::{tag, take_until},
     error::{Error, ErrorKind},
 };
 

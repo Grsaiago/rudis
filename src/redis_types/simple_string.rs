@@ -1,7 +1,7 @@
 use crate::redis_types::RedisType;
 use nom::{
     IResult,
-    bytes::complete::{tag, take_until},
+    bytes::streaming::{tag, take_until},
 };
 
 #[derive(Debug, PartialEq, Eq)]

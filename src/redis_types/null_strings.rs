@@ -1,4 +1,4 @@
-use nom::{IResult, bytes::complete::tag};
+use nom::{IResult, bytes::streaming::tag};
 
 use crate::redis_types::RedisType;
 
