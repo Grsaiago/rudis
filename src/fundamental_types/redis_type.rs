@@ -27,6 +27,17 @@ impl RedisType {
         ))
         .parse(input)
     }
+
+    pub fn type_name(&self) -> &'static str {
+        match self {
+            RedisType::Array(_) => "Array",
+            RedisType::NullBulkString(_) => "Null Bulk String",
+            RedisType::BulkString(_) => "Bulk String",
+            RedisType::Integer(_) => "Integer",
+            RedisType::SimpleString(_) => "Simple String",
+            RedisType::SimpleError(_) => "Simple Error",
+        }
+    }
 }
 
 #[cfg(test)]
