@@ -36,6 +36,12 @@ impl BulkStringDataType {
     }
 }
 
+impl AsRef<str> for BulkStringDataType {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 #[cfg(test)]
 mod test {
     use nom::IResult;

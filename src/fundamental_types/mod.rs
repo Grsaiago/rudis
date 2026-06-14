@@ -1,6 +1,5 @@
 mod array;
 mod bulk_string;
-mod command;
 mod integer;
 mod null_strings;
 mod redis_type;

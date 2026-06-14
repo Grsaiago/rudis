@@ -26,6 +26,12 @@ impl SimpleErrorDataType {
     }
 }
 
+impl AsRef<str> for SimpleErrorDataType {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 #[cfg(test)]
 mod test {
     use nom::IResult;

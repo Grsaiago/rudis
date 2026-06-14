@@ -26,6 +26,12 @@ impl SimpleStringDataType {
     }
 }
 
+impl AsRef<str> for SimpleStringDataType {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 #[cfg(test)]
 mod test {
     use nom::IResult;
