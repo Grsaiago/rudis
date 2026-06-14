@@ -3,4 +3,4 @@ mod error;
 mod ping;
 
 pub use command::Command;
-pub use error::CommandError;
+pub use error::CommandParseError;

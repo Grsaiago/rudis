@@ -41,6 +41,12 @@ impl ArrayDataType {
     }
 }
 
+impl From<Vec<RedisType>> for ArrayDataType {
+    fn from(value: Vec<RedisType>) -> Self {
+        Self(value)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use nom::IResult;
