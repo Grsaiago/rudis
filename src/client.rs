@@ -13,6 +13,9 @@ pub struct Client {
 impl Client {
     pub fn new(conn: TcpStream) -> Self {
         let buff = Vec::with_capacity(50);
+        let _ = conn.set_nodelay(true).inspect_err(|err| {
+            tracing::debug!("failed to set TCP_NODELAY: {}", err);
+        });
         Self { conn, buff }
     }
 
