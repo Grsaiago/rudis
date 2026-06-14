@@ -1,38 +1,21 @@
-use tokio::{
-    io::{self, AsyncWriteExt, BufStream},
-    net::{TcpListener, TcpStream},
-};
-use tokio_stream::{StreamExt, wrappers::TcpListenerStream};
+mod client;
+mod config;
+mod errors;
 mod redis_types;
+mod server;
 
-#[derive(Debug)]
-struct Server {
-    listener: TcpListenerStream,
-}
+use tokio::{io, net::TcpListener};
 
-impl Server {
-    fn new(listener: TcpListener) -> Self {
-        Server {
-            listener: TcpListenerStream::new(listener),
-        }
-    }
-}
-
-struct Client {
-    conn: BufStream<TcpStream>,
-}
-
-impl Client {
-    fn new(conn: TcpStream) -> Self {
-        Self {
-            conn: BufStream::new(conn),
-        }
-    }
-}
+use crate::config::ClientConfig;
+use crate::server::Server;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
     tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")), // Fallback level
+        )
         .with_line_number(true)
         .with_target(true)
         .with_file(true)
@@ -41,33 +24,23 @@ async fn main() -> io::Result<()> {
     let host = "127.0.0.1";
     let port = "6379";
 
-    let listener = TcpListener::bind(format!("{}:{}", host, port))
-        .await
-        .inspect_err(|err| {
-            tracing::error!("failed to bind on addr [{}:{}]: {}", host, port, err)
-        })?;
-    tracing::info!("listening on {}:{}", host, port);
+    let listener = match TcpListener::bind(format!("{}:{}", host, port)).await {
+        Err(err) => {
+            tracing::error!("failed to bind on addr [{}:{}]: {}", host, port, err);
+            std::process::exit(1);
+        }
+        Ok(socket) => {
+            tracing::debug!("listening socket binded on {}:{}", host, port);
+            socket
+        }
+    };
 
-    let mut server = Server::new(listener);
-    while let Some(conn_result) = server.listener.next().await {
-        let new_conn = match conn_result {
-            Ok(conn) => conn,
-            Err(err) => {
-                tracing::error!("new connection failed: {}", err);
-                continue;
-            }
-        };
-        tokio::task::spawn(async move {
-            let mut client = Client::new(new_conn);
-            tracing::info!("accepted and constructed new client");
-            if let Err(err) = client.conn.write(b"bem vindo ao servidor ihuuuuu\n").await {
-                tracing::error!("failed to write to client buffer: {}", err);
-            }
-            if let Err(err) = client.conn.flush().await {
-                tracing::error!("failed to write to client socket: {}", err);
-            }
-        });
-    }
+    let config = ClientConfig {
+        client_buff_initial_size: 50,
+    };
 
+    let server = Server::new(listener, config);
+    tracing::info!("starting server listen {}:{}", host, port);
+    server.listen_and_serve().await;
     Ok(())
 }

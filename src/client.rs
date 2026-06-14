@@ -1,0 +1,54 @@
+use tokio::io::AsyncReadExt;
+use tokio::net::TcpStream;
+use tokio::time::timeout;
+
+use crate::errors::ClientRequestErr;
+use crate::redis_types::RedisType;
+
+pub struct Client {
+    pub conn: TcpStream,
+    pub buff: Vec<u8>,
+}
+
+impl Client {
+    pub fn new(conn: TcpStream) -> Self {
+        let buff = Vec::with_capacity(50);
+        Self { conn, buff }
+    }
+
+    pub async fn handle_connection(self) {
+        let request = self.read_request().await;
+        tracing::debug!("received client message {:?}", request);
+    }
+
+    pub async fn read_request(mut self) -> Result<RedisType, ClientRequestErr> {
+        let mut tmp_buff = [0u8; 50];
+        loop {
+            let n = timeout(
+                tokio::time::Duration::from_secs(20),
+                self.conn.read(&mut tmp_buff),
+            )
+            .await??;
+
+            self.buff.extend(&tmp_buff[..n]);
+            match RedisType::parse(str::from_utf8(&self.buff).unwrap()) {
+                Ok((_, parsed_value)) => return Ok(parsed_value),
+                Err(err) => match err {
+                    nom::Err::Incomplete(_) => {
+                        tracing::debug!(
+                            "incomplete parsing of client message [{:?}]",
+                            str::from_utf8(&self.buff).unwrap()
+                        );
+                        continue;
+                    }
+                    nom::Err::Error(inner_parse_err) | nom::Err::Failure(inner_parse_err) => {
+                        tracing::debug!("failed to parse client message [{:?}]", self.buff);
+                        return Err(ClientRequestErr::ParseError(
+                            inner_parse_err.input.len() as u32
+                        ));
+                    }
+                },
+            }
+        }
+    }
+}

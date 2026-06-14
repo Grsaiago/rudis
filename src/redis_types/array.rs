@@ -1,6 +1,6 @@
 use nom::{
     IResult,
-    bytes::streaming::{tag, take_until},
+    bytes::streaming::{tag, take_while},
     error::{Error, ErrorKind},
 };
 
@@ -18,11 +18,11 @@ impl ArrayDataType {
 
     pub fn parse<'a>(input: &'a str) -> IResult<&'a str, RedisType> {
         let (input, _) = tag(Self::RESP_IDENTIFIER)(input)?;
-        let (input, vector_len_raw) = take_until("\r\n")(input)?;
+        let (input, vector_len_raw) = take_while(|c: char| !c.is_ascii_whitespace())(input)?;
         let (input, _) = tag("\r\n")(input)?;
         let vector_len = match vector_len_raw.parse::<u64>() {
             Ok(val) => val,
-            Err(_) => return Err(nom::Err::Failure(Error::new(input, ErrorKind::MapRes))),
+            Err(_) => return Err(nom::Err::Error(Error::new(input, ErrorKind::MapRes))),
         };
 
         let (input, resp_vec) = (0..vector_len).try_fold(
@@ -115,5 +115,51 @@ mod test {
                 i, &input
             );
         }
+    }
+
+    #[test]
+    fn parse_fails_with_error_when_element_starts_without_resp_identifier() {
+        let input = "*1\r\n\n\r";
+        let expected = Err(nom::Err::Error(nom::error::Error::new(
+            "\n\r",
+            nom::error::ErrorKind::Tag,
+        )));
+
+        let result = ArrayDataType::parse(input);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_returns_incomplete_when_element_is_truncated() {
+        let input = "*1\r\n:1";
+        let expected = Err(nom::Err::Incomplete(nom::Needed::Size(
+            std::num::NonZeroUsize::new(1).unwrap(),
+        )));
+
+        let result = ArrayDataType::parse(input);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_fails_with_failure_when_element_contains_invalid_data() {
+        let input = "*1\r\n:abc\r\n";
+        let expected = Err(nom::Err::Failure(nom::error::Error::new(
+            "",
+            nom::error::ErrorKind::MapRes,
+        )));
+
+        let result = ArrayDataType::parse(input);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_returns_incomplete_when_element_data_is_absent() {
+        let input = "*1\r\n";
+        let expected = Err(nom::Err::Incomplete(nom::Needed::Size(
+            std::num::NonZeroUsize::new(1).unwrap(),
+        )));
+
+        let result = ArrayDataType::parse(input);
+        assert_eq!(result, expected);
     }
 }
