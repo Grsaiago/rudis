@@ -21,12 +21,12 @@ impl TryFrom<ArrayDataType> for Command {
 
         match &value.0[0] {
             RedisType::BulkString(cmd_name) => {
-                let cmd_name = cmd_name.as_ref().to_lowercase();
+                let cmd_name = cmd_name.as_ref().to_uppercase();
                 value.0.remove(0);
                 let cmd_args = ArrayDataType::from(value.0);
 
                 match cmd_name.as_ref() {
-                    "ping" => {
+                    "PING" => {
                         tracing::debug!("received ping command with args {:?}", &cmd_args);
                         Ok(Command::Ping(cmd_args.try_into()?))
                     }

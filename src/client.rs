@@ -2,8 +2,9 @@ use tokio::io::AsyncReadExt;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 
+use crate::commands::Command;
 use crate::errors::ClientRequestErr;
-use crate::fundamental_types::RedisType;
+use crate::fundamental_types::{ArrayDataType, RedisType};
 
 pub struct Client {
     pub conn: TcpStream,
@@ -19,12 +20,33 @@ impl Client {
         Self { conn, buff }
     }
 
-    pub async fn handle_connection(self) {
-        let request = self.read_request().await;
-        tracing::debug!("received client message {:?}", request);
+    pub async fn handle_connection(mut self) {
+        loop {
+            let resp_request = match self.read_request().await {
+                Ok(val) => val,
+                Err(err) => {
+                    tracing::debug!("failed to process client request {}", err.to_string());
+                    return;
+                }
+            };
+            tracing::debug!("received client message {:?}", resp_request);
+            let request = match resp_request {
+                RedisType::Array(value) => value,
+                fallback => {
+                    tracing::debug!(
+                        "expected request as {}, got {}",
+                        std::any::type_name::<ArrayDataType>(),
+                        fallback.type_name()
+                    );
+                    return;
+                }
+            };
+            let cmd = Command::try_from(request);
+            tracing::debug!("received request {:?}", cmd);
+        }
     }
 
-    pub async fn read_request(mut self) -> Result<RedisType, ClientRequestErr> {
+    pub async fn read_request(&mut self) -> Result<RedisType, ClientRequestErr> {
         let mut tmp_buff = [0u8; 50];
         loop {
             let n = timeout(
