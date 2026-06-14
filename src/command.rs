@@ -1,4 +1,4 @@
-use crate::fundamental_types::RedisType;
+use crate::fundamental_types::{BulkStringDataType, RedisType};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum CommandName {
@@ -7,15 +7,15 @@ pub enum CommandName {
     Set,
 }
 
-impl TryFrom<&str> for CommandName {
+impl TryFrom<BulkStringDataType> for CommandName {
     type Error = String;
 
-    fn try_from(s: &str) -> Result<Self, Self::Error> {
-        match s {
+    fn try_from(s: BulkStringDataType) -> Result<Self, Self::Error> {
+        match s.as_ref() {
             "PING" => Ok(CommandName::Ping),
             "GET" => Ok(CommandName::Get),
             "SET" => Ok(CommandName::Set),
-            _ => Err(format!("Unknown command: {}", s)),
+            _ => Err(format!("Unknown command: {}", s.as_ref())),
         }
     }
 }
