@@ -1,5 +1,5 @@
 mod client;
-mod command;
+mod commands;
 mod config;
 mod errors;
 mod fundamental_types;
