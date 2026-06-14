@@ -4,7 +4,7 @@ use nom::{
     bytes::streaming::{tag, take_until},
 };
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SimpleErrorDataType(String);
 
 impl SimpleErrorDataType {

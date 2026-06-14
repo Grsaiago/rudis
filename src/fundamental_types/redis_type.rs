@@ -1,14 +1,14 @@
 use nom::{IResult, Parser, branch::alt};
 
 use crate::fundamental_types::{
-    ArrayDataType, BulkStringDataType, IntegerDataType, NullBulkStringData, SimpleErrorDataType,
-    SimpleStringDataType,
+    ArrayDataType, BulkStringDataType, IntegerDataType, NullBulkStringDataType,
+    SimpleErrorDataType, SimpleStringDataType,
 };
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum RedisType {
     Array(ArrayDataType),
-    NullBulkString(NullBulkStringData),
+    NullBulkString(NullBulkStringDataType),
     BulkString(BulkStringDataType),
     Integer(IntegerDataType),
     SimpleString(SimpleStringDataType),
@@ -19,7 +19,7 @@ impl RedisType {
     pub fn parse<'a>(input: &'a str) -> IResult<&'a str, RedisType> {
         alt((
             ArrayDataType::parse,
-            NullBulkStringData::parse, // this has to be before the BulkString because They're the same identifier
+            NullBulkStringDataType::parse, // this has to be before the BulkString because They're the same identifier
             BulkStringDataType::parse,
             IntegerDataType::parse,
             SimpleErrorDataType::parse,
@@ -33,7 +33,7 @@ impl RedisType {
 mod test {
     use nom::IResult;
 
-    use crate::fundamental_types::{NullBulkStringData, RedisType};
+    use crate::fundamental_types::{NullBulkStringDataType, RedisType};
 
     #[test]
     fn simple_parse() {
@@ -44,7 +44,7 @@ mod test {
 
         let cases = [TestCase {
             input: "$-1\r\n",
-            expected: Ok(("", RedisType::NullBulkString(NullBulkStringData::new()))),
+            expected: Ok(("", RedisType::NullBulkString(NullBulkStringDataType::new()))),
         }];
 
         for (i, case) in cases.iter().enumerate() {

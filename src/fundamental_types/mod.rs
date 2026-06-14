@@ -9,7 +9,7 @@ mod simple_string;
 pub use array::ArrayDataType;
 pub use bulk_string::BulkStringDataType;
 pub use integer::IntegerDataType;
-pub use null_strings::NullBulkStringData;
+pub use null_strings::NullBulkStringDataType;
 pub use redis_type::RedisType;
 pub use simple_error::SimpleErrorDataType;
 pub use simple_string::SimpleStringDataType;

@@ -6,7 +6,7 @@ use nom::{
 
 use crate::fundamental_types::RedisType;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct BulkStringDataType(String);
 
 impl BulkStringDataType {

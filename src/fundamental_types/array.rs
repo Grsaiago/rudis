@@ -6,8 +6,8 @@ use nom::{
 
 use crate::fundamental_types::RedisType;
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct ArrayDataType(Vec<RedisType>);
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct ArrayDataType(pub Vec<RedisType>);
 
 impl ArrayDataType {
     const RESP_IDENTIFIER: &str = "*";
