@@ -4,7 +4,7 @@ use nom::{
     error::{Error, ErrorKind},
 };
 
-use crate::redis_types::RedisType;
+use crate::fundamental_types::RedisType;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct BulkStringDataType(String);
@@ -40,7 +40,7 @@ impl BulkStringDataType {
 mod test {
     use nom::IResult;
 
-    use crate::redis_types::{BulkStringDataType, RedisType};
+    use crate::fundamental_types::{BulkStringDataType, RedisType};
 
     #[test]
     fn simple_parse() {

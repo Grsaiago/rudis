@@ -1,7 +1,7 @@
 mod client;
 mod config;
 mod errors;
-mod redis_types;
+mod fundamental_types;
 mod server;
 
 use tokio::{io, net::TcpListener};

@@ -1,6 +1,6 @@
 use nom::{IResult, bytes::streaming::tag};
 
-use crate::redis_types::RedisType;
+use crate::fundamental_types::RedisType;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct NullBulkStringData;
@@ -20,7 +20,7 @@ impl NullBulkStringData {
 
 #[cfg(test)]
 mod test {
-    use crate::redis_types::{NullBulkStringData, RedisType};
+    use crate::fundamental_types::{NullBulkStringData, RedisType};
 
     #[test]
     fn simple_parse() {

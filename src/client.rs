@@ -3,7 +3,7 @@ use tokio::net::TcpStream;
 use tokio::time::timeout;
 
 use crate::errors::ClientRequestErr;
-use crate::redis_types::RedisType;
+use crate::fundamental_types::RedisType;
 
 pub struct Client {
     pub conn: TcpStream,

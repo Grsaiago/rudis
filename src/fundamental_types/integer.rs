@@ -4,7 +4,7 @@ use nom::{
     error::{Error, ErrorKind},
 };
 
-use crate::redis_types::RedisType;
+use crate::fundamental_types::RedisType;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct IntegerDataType(i64);
@@ -32,7 +32,7 @@ impl IntegerDataType {
 mod test {
     use nom::IResult;
 
-    use crate::redis_types::{IntegerDataType, RedisType};
+    use crate::fundamental_types::{IntegerDataType, RedisType};
 
     #[test]
     fn simple_parse() {

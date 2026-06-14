@@ -4,7 +4,7 @@ use nom::{
     error::{Error, ErrorKind},
 };
 
-use crate::redis_types::RedisType;
+use crate::fundamental_types::RedisType;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ArrayDataType(Vec<RedisType>);
@@ -45,7 +45,7 @@ impl ArrayDataType {
 mod test {
     use nom::IResult;
 
-    use crate::redis_types::{ArrayDataType, IntegerDataType, RedisType};
+    use crate::fundamental_types::{ArrayDataType, IntegerDataType, RedisType};
 
     #[test]
     fn simple_parse() {

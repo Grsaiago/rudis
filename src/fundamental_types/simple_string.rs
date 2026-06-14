@@ -1,4 +1,4 @@
-use crate::redis_types::RedisType;
+use crate::fundamental_types::RedisType;
 use nom::{
     IResult,
     bytes::streaming::{tag, take_until},
@@ -30,7 +30,7 @@ impl SimpleStringDataType {
 mod test {
     use nom::IResult;
 
-    use crate::redis_types::{RedisType, SimpleStringDataType};
+    use crate::fundamental_types::{RedisType, SimpleStringDataType};
 
     #[test]
     fn simple_parse() {

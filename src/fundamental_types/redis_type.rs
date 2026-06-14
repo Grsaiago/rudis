@@ -1,6 +1,6 @@
 use nom::{IResult, Parser, branch::alt};
 
-use crate::redis_types::{
+use crate::fundamental_types::{
     ArrayDataType, BulkStringDataType, IntegerDataType, NullBulkStringData, SimpleErrorDataType,
     SimpleStringDataType,
 };
@@ -33,7 +33,7 @@ impl RedisType {
 mod test {
     use nom::IResult;
 
-    use crate::redis_types::{NullBulkStringData, RedisType};
+    use crate::fundamental_types::{NullBulkStringData, RedisType};
 
     #[test]
     fn simple_parse() {
