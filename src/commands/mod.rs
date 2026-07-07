@@ -1,6 +1,6 @@
-mod command;
 mod error;
 mod ping;
+mod redis_command;
 
-pub use command::Command;
 pub use error::CommandParseError;
+pub use redis_command::RedisCommand;

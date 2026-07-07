@@ -2,7 +2,7 @@ use tokio::io::AsyncReadExt;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 
-use crate::commands::Command;
+use crate::commands::RedisCommand;
 use crate::errors::ClientRequestErr;
 use crate::fundamental_types::{ArrayDataType, RedisType};
 
@@ -41,7 +41,7 @@ impl Client {
                     return;
                 }
             };
-            let cmd = Command::try_from(request);
+            let cmd = RedisCommand::try_from(request);
             tracing::debug!("received request {:?}", cmd);
         }
     }

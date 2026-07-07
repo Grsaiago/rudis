@@ -7,15 +7,15 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub enum Command {
+pub enum RedisCommand {
     Ping(PingCommandDataType),
 }
 
-impl Command {
+impl RedisCommand {
     const PING_IDENTIFIER: &str = "PING";
 }
 
-impl TryFrom<ArrayDataType> for Command {
+impl TryFrom<ArrayDataType> for RedisCommand {
     type Error = CommandParseError;
 
     fn try_from(value: ArrayDataType) -> Result<Self, Self::Error> {
@@ -39,9 +39,9 @@ impl TryFrom<ArrayDataType> for Command {
 
         let cmd_args: ArrayDataType = it.collect();
         match cmd_name.as_ref() {
-            Command::PING_IDENTIFIER => {
+            RedisCommand::PING_IDENTIFIER => {
                 tracing::debug!("received ping command with args {:?}", &cmd_args);
-                return Ok(Command::Ping(cmd_args.try_into()?));
+                return Ok(RedisCommand::Ping(cmd_args.try_into()?));
             }
             fallback => {
                 tracing::debug!("received non-supported command [{}]", fallback);
