@@ -56,8 +56,13 @@ impl Client {
             .await??;
 
             self.buff.extend(&tmp_buff[..n]);
-            match RedisType::parse(str::from_utf8(&self.buff).unwrap()) {
-                Ok((_, parsed_value)) => return Ok(parsed_value),
+            let input = str::from_utf8(&self.buff).unwrap();
+            match RedisType::parse(input) {
+                Ok((remaining, parsed_value)) => {
+                    let consumed = input.len() - remaining.len();
+                    self.buff.drain(..consumed);
+                    return Ok(parsed_value);
+                }
                 Err(err) => match err {
                     nom::Err::Incomplete(_) => {
                         tracing::debug!(

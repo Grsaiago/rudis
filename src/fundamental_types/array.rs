@@ -47,6 +47,22 @@ impl From<Vec<RedisType>> for ArrayDataType {
     }
 }
 
+impl IntoIterator for ArrayDataType {
+    type Item = RedisType;
+
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+impl<RedisType> FromIterator<RedisType> for ArrayDataType {
+    fn from_iter<T: IntoIterator<Item = RedisType>>(iter: T) -> Self {
+        iter.into_iter().collect()
+    }
+}
+
 #[cfg(test)]
 mod test {
     use nom::IResult;
