@@ -57,9 +57,9 @@ impl IntoIterator for ArrayDataType {
     }
 }
 
-impl<RedisType> FromIterator<RedisType> for ArrayDataType {
+impl FromIterator<RedisType> for ArrayDataType {
     fn from_iter<T: IntoIterator<Item = RedisType>>(iter: T) -> Self {
-        iter.into_iter().collect()
+        ArrayDataType(iter.into_iter().collect())
     }
 }
 
